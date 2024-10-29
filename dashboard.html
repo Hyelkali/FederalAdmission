@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Federal Polytechnic Student Admission System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5a623;
+            --background-color: #f0f4f8;
+            --text-color: #333;
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background-color: #e9e9e9;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            font-weight: bold;
+        }
+        .tab:hover, .tab.active {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .tab-content.active {
+            display: block;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #3a7bc8;
+        }
+        #message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        #adminPanel {
+            margin-top: 20px;
+        }
+        .application-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .application-card button {
+            margin-top: 10px;
+            background-color: var(--secondary-color);
+        }
+        .application-card button:hover {
+            background-color: #e09612;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .password-strength {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        .weak { color: var(--error-color); }
+        .medium { color: var(--secondary-color); }
+        .strong { color: var(--success-color); }
+        .policy-links {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .policy-links a {
+            margin: 0 10px;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        .policy-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Federal Polytechnic Student Admission System</h1>
+        <div class="tabs">
+            <div class="tab active" data-tab="apply"><i class="fas fa-user-plus"></i> Apply</div>
+            <div class="tab" data-tab="check"><i class="fas fa-search"></i> Check Status</div>
+            <div class="tab" data-tab="admin-login"><i class="fas fa-user-shield"></i> Admin Login</div>
+            <div class="tab" data-tab="admin" style="display: none;"><i class="fas fa-users-cog"></i> Admin Panel</div>
+        </div>
+        <div id="apply" class="tab-content active">
+            <form id="applicationForm">
+                <label for="fullName">Full Name:</label>
+                <input type="text" id="fullName" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" required minlength="8">
+                <div id="passwordStrength" class="password-strength"></div>
+
+                <label for="confirmPassword">Confirm Password:</label>
+                <input type="password" id="confirmPassword" required minlength="8">
+
+                <label for="phone">Phone Number:</label>
+                <input type="tel" id="phone" required>
+
+                <label for="dob">Date of Birth:</label>
+                <input type="date" id="dob" required>
+
+                <label for="gender">Gender:</label>
+                <select id="gender" required>
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+
+                <label for="program">Desired Program:</label>
+                <input type="text" id="program" required>
+
+                <label for="qualifications">Educational Qualifications:</label>
+                <input type="text" id="qualifications" required>
+
+                <button type="submit"><i class="fas fa-paper-plane"></i> Submit Application</button>
+            </form>
+        </div>
+        <div id="check" class="tab-content">
+            <form id="checkStatusForm">
+                <label for="checkEmail">Email:</label>
+                <input type="email" id="checkEmail" required>
+
+                <label for="checkPassword">Password:</label>
+                <input type="password" id="checkPassword" required>
+
+                <button type="submit"><i class="fas fa-search"></i> Check Admission Status</button>
+            </form>
+        </div>
+        <div id="admin-login" class="tab-content">
+            <form id="adminLoginForm">
+                <label for="adminPassword">Admin Password:</label>
+                <input type="password" id="adminPassword" required>
+
+                <button type="submit"><i class="fas fa-sign-in-alt"></i> Login as Admin</button>
+            </form>
+        </div>
+        <div id="admin" class="tab-content">
+            <h2>Student Applications</h2>
+            <div id="adminPanel"></div>
+        </div>
+        <div id="message"></div>
+        <div class="loader"></div>
+        <div class="policy-links">
+            <a href="#" id="privacyPolicy">Privacy Policy</a>
+            <a href="#" id="termsOfService">Terms of Service</a>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script>
+        // Firebase Initialization
+const firebaseConfig = {
+    apiKey: "AIzaSyBj_Do5VEWFbchJWuIK8msfi9o3LWtahO4",
+    authDomain: "federaladmin.firebaseapp.com",
+    projectId: "federaladmin",
+    storageBucket: "federaladmin.appspot.com",
+    messagingSenderId: "656173219599",
+    appId: "1:656173219599:web:4a2deedb4c33fd1166487a",
+    measurementId: "G-7PKJ8YJYK5"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// Tab functionality
+const tabs = document.querySelectorAll('.tab');
+const tabContents = document.querySelectorAll('.tab-content');
+
+tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const tabId = tab.getAttribute('data-tab');
+        tabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+    });
+});
+
+// Show/hide loader
+function toggleLoader(show) {
+    const loader = document.querySelector('.loader');
+    loader.style.display = show ? 'block' : 'none';
+}
+
+// Password strength checker
+function checkPasswordStrength(password) {
+    const strengthDiv = document.getElementById('passwordStrength');
+    const strength = {
+        0: "Weak",
+        1: "Medium",
+        2: "Strong"
+    };
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (password.match(/[a-z]/) && password.match(/[A-Z]/) && password.match(/[0-9]/)) score++;
+    strengthDiv.textContent = `Password strength: ${strength[score]}`;
+    strengthDiv.className = 'password-strength ' + strength[score].toLowerCase();
+}
+
+document.getElementById('password').addEventListener('input', (e) => {
+    checkPasswordStrength(e.target.value);
+});
+
+// Data validation
+function validateForm(formData) {
+    const email = formData.get('email');
+    const password = formData.get('password');
+    const confirmPassword = formData.get('confirmPassword');
+    const phone = formData.get('phone');
+
+    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        throw new Error("Invalid email format");
+    }
+    if (password.length < 8) {
+        throw new Error("Password must be at least 8 characters long");
+    }
+    if (password !== confirmPassword) {
+        throw new Error("Passwords do not match");
+    }
+    if (!phone.match(/^\d{10}$/)) {
+        throw new Error("Phone number must be 10 digits");
+    }
+}
+
+// Application submission
+document.getElementById('applicationForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    toggleLoader(true);
+    
+    const formData = new FormData(e.target);
+
+    try {
+        validateForm(formData);
+
+
+        const userCredential = await auth.createUserWithEmailAndPassword(formData.get('email'), formData.get('password'));
+        await userCredential.user.sendEmailVerification();
+
+        await db.collection("applications").add({
+            userId: userCredential.user.uid,
+            fullName: formData.get('fullName'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            dob: formData.get('dob'),
+            gender: formData.get('gender'),
+            program: formData.get('program'),
+            qualifications: formData.get('qualifications'),
+            status: "Pending",
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        displayMessage("Application submitted successfully! Please check your email to verify your account.", "success");
+        e.target.reset();
+    } catch (error) {
+        displayMessage("Error: " + error.message, "error");
+    } finally {
+        toggleLoader(false);
+    }
+});
+
+// Check admission status
+document.getElementById('checkStatusForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    toggleLoader(true);
+    
+    const email = document.getElementById('checkEmail').value;
+    const password = document.getElementById('checkPassword').value;
+
+    try {
+        await auth.signInWithEmailAndPassword(email, password);
+        const querySnapshot = await db.collection("applications").where("email", "==", email).get();
+
+        if (!querySnapshot.empty) {
+            const doc = querySnapshot.docs[0];
+            const data = doc.data();
+            let statusMessage = `Your application status is: ${data.status}`;
+            if (data.status === "Admitted") {
+                statusMessage += ". Congratulations!";
+            } else if (data.status === "Pending") {
+                statusMessage += ". Please check back later for  updates.";
+            }
+            displayMessage(statusMessage, "info");
+        } else {
+            displayMessage("No application found for this email.", "error");
+        }
+    } catch (error) {
+        displayMessage("Error checking status: " + error.message, "error");
+    } finally {
+        toggleLoader(false);
+    }
+});
+
+// Admin login
+document.getElementById('adminLoginForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    toggleLoader(true);
+    
+    const password = document.getElementById('adminPassword').value;
+
+    if (password === "admin@federalPoly") {
+        document.querySelector('.tab[data-tab="admin"]').style.display = 'block';
+        document.querySelector('.tab[data-tab="admin"]').click();
+        displayMessage("Admin logged in successfully.", "success");
+        loadAdminPanel();
+    } else {
+        displayMessage("Invalid admin password.", "error");
+    }
+    toggleLoader(false);
+});
+
+// Load admin panel
+async function loadAdminPanel() {
+    const adminPanel = document.getElementById('adminPanel');
+    adminPanel.innerHTML = '';
+    toggleLoader(true);
+
+    try {
+        const querySnapshot = await db.collection("applications").orderBy("createdAt", "desc").get();
+        if (querySnapshot.empty) {
+            adminPanel.innerHTML = '<p>No applications found.</p>';
+        } else {
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const applicationCard = document.createElement('div');
+                applicationCard.className = 'application-card';
+                applicationCard.innerHTML = `
+                    <p><strong>Name:</strong> ${data.fullName}</p>
+                    <p><strong>Email:</strong> ${data.email}</p>
+                    <p><strong>Program:</strong> ${data.program}</p>
+                    <p><strong>Status:</strong> ${data.status}</p>
+                    <p><strong>Applied on:</strong> ${data.createdAt ? data.createdAt.toDate().toLocaleString() : 'N/A'}</p>
+                    ${data.status === "Pending" ? `<button onclick="admitStudent('${doc.id}', '${data.email}')"><i class="fas fa-user-check"></i> Admit</button>` : ''}
+                `;
+                adminPanel.appendChild(applicationCard);
+            });
+        }
+    } catch (error) {
+        console.error("Error loading applications:", error);
+        adminPanel.innerHTML = '<p>Error loading applications. Please try again.</p>';
+    } finally {
+        toggleLoader(false);
+    }
+}
+
+// Admit student
+async function admitStudent(docId, email) {
+    toggleLoader(true);
+    try {
+        await db.collection("applications").doc(docId).update({ 
+            status: "Admitted",
+            admittedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        // Send email to student (in a real application, this would be done server-side)
+        console.log(`Sending admission email to ${email}`);
+        displayMessage(`Student ${email} has been admitted.`, "success");
+        
+        loadAdminPanel();
+    } catch (error) {
+        console.error("Error admitting student:", error);
+        displayMessage("Error admitting student: " + error.message, "error");
+    } finally {
+        toggleLoader(false);
+    }
+}
+
+// Display message
+function displayMessage(message, type) {
+    const messageDiv = document.getElementById('message');
+    messageDiv.textContent = message;
+    messageDiv.className = type;
+    messageDiv.style.display = 'block';
+    setTimeout(() => {
+        messageDiv.style.display = 'none';
+        messageDiv.textContent = '';
+        messageDiv.className = '';
+    }, 5000);
+}
+
+// Privacy Policy and Terms of Service
+document.getElementById('privacyPolicy').addEventListener('click', (e) => {
+    e.preventDefault();
+    alert("Privacy Policy: We collect and store your personal information for the purpose of processing your admission application. We do not share your information with third parties without your consent.");
+});
+
+document.getElementById('termsOfService').addEventListener('click', (e) => {
+    e.preventDefault();
+    alert("Terms of Service: By using this system, you agree to provide accurate information and abide by the rules and regulations of the Federal Polytechnic.");
+});
+
+// Initial load of admin panel if admin is already logged in
+if (document.querySelector('.tab[data-tab="admin"]').style.display === 'block') {
+    loadAdminPanel();
+}
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>
